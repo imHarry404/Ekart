@@ -1,0 +1,24 @@
+commands to run to setup k8s master & node.
+
+# step 1:
+on master node & worker as well:
+sudo apt-get update -y
+apt-get install docker.io -y
+service docker restart
+sudo curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" >/etc/apt/sources.list.d/kubernetes.list
+apt-get update -y
+apt install kubeadm=1.20.0-00 kubectl=1.20.0-00 kubelet=1.20.0-00 -y
+
+
+# on master only:
+kubeadm init --pod-network-cidr=192.168.0.0/16
+
+# on master only (you can find this on console)
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+on master node
+kubectl apply -f https://docs.projectcalico.org/v3.20/manifests/calico.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.49.0/deploy/static/provider/baremetal/deploy.yaml
